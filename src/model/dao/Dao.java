@@ -89,4 +89,39 @@ public class Dao {
 		}		
 		return myynnit;
 	}
+	public boolean lisaaMyynti(Myynti myynti){
+		boolean paluuArvo=true;
+		sql="INSERT INTO asiakkaat VALUES(?,?,?,?,?)";						  
+		try {
+			con = yhdista();
+			stmtPrep=con.prepareStatement(sql); 
+			stmtPrep.setInt(1, myynti.getTunniste());
+			stmtPrep.setString(2, myynti.getEtunimi());
+			stmtPrep.setString(3, myynti.getSukunimi());
+			stmtPrep.setString(4, myynti.getPuhelin());
+			stmtPrep.setString(5, myynti.getSposti());
+			stmtPrep.executeUpdate();
+	        con.close();
+		} catch (Exception e) {				
+			e.printStackTrace();
+			paluuArvo=false;
+		}				
+		return paluuArvo;
+	}
+	
+	public boolean poistaMyynti(String id){ //Oikeassa el‰m‰ss‰ tiedot ensisijaisesti merkit‰‰n poistetuksi.
+		boolean paluuArvo=true;
+		sql="DELETE FROM asiakkaat WHERE asiakas_id=?";						  
+		try {
+			con = yhdista();
+			stmtPrep=con.prepareStatement(sql); 
+			stmtPrep.setString(1, id);			
+			stmtPrep.executeUpdate();
+	        con.close();
+		} catch (Exception e) {				
+			e.printStackTrace();
+			paluuArvo=false;
+		}				
+		return paluuArvo;
+	}
 }

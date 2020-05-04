@@ -34,8 +34,11 @@ tr:nth-child(even) {
 <table id="listaus">
 	<thead>	
 		<tr>
+			<th colspan="5" class="oikealle"><span id="uusiAsiakas">Lis‰‰ uusi asiakas</span></th>
+		</tr>
+		<tr>
 			<th class="oikealle">Hakusana:</th>
-			<th colspan="2"><input type="text" id="hakusana"></th>
+			<th colspan="3"><input type="text" id="hakusana"></th>
 			<th><input type="button" value="hae" id="hakunappi" class="btn btn-primary"></th>
 		</tr>			
 		<tr>
@@ -51,6 +54,10 @@ tr:nth-child(even) {
 </table>
 <script>
 $(document).ready(function(){
+	
+	$("#uusiAsiakas").click(function(){
+		document.location="lisaamyynti.jsp";
+	});
 	
 	haeMyynnit();
 	$("#hakunappi").click(function(){		
@@ -75,11 +82,25 @@ function haeMyynnit(){
         	htmlStr+="<td>"+field.etunimi+"</td>";
         	htmlStr+="<td>"+field.sukunimi+"</td>";
         	htmlStr+="<td>"+field.puhelin+"</td>";
-        	htmlStr+="<td>"+field.sposti+"</td>";  
+        	htmlStr+="<td>"+field.sposti+"</td>"; 
+        	htmlStr+="<td><span class='poista' onclick=poista('"+field.tunniste+"')>Poista</span></td>";
         	htmlStr+="</tr>";
         	$("#listaus tbody").append(htmlStr);
         });	
     }});
+}
+function poista(tunniste){
+	if(confirm("Poista asiakas " + tunniste +"?")){
+		$.ajax({url:"myynnit/"+tunniste, type:"DELETE", dataType:"json", success:function(result) { //result on joko {"response:1"} tai {"response:0"}
+	        if(result.response==0){
+	        	$("#ilmo").html("Asiakkaan poisto ep‰onnistui.");
+	        }else if(result.response==1){
+	        	$("#rivi_"+tunniste).css("background-color", "red"); //V‰rj‰t‰‰n poistetun asiakkaan rivi
+	        	alert("Asiakkaan " + tunniste +" poisto onnistui.");
+				haeMyynnit();        	
+			}
+	    }});
+	}
 }
 
 </script>
