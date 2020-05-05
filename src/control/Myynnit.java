@@ -36,13 +36,18 @@ public class Myynnit extends HttpServlet {
 		}else if(pathInfo.indexOf("haeyksi")!=-1) {		//polussa on sana "haeyksi", eli haetaan yhden auton tiedot
 			String tunniste = pathInfo.replace("/haeyksi/", ""); //poistetaan polusta "/haeyksi/", j‰ljelle j‰‰ rekno		
 			Myynti myynti = dao.etsiMyynti(tunniste);
+			
+			if(myynti==null) {
+				strJSON = "{}";
+			}else {
 			JSONObject JSON = new JSONObject();
 			JSON.put("tunniste", myynti.getTunniste());
 			JSON.put("etunimi", myynti.getEtunimi());
 			JSON.put("sukunimi", myynti.getSukunimi());
 			JSON.put("puhelin", myynti.getPuhelin());
 			JSON.put("email", myynti.getSposti());
-			strJSON = JSON.toString();		
+			strJSON = JSON.toString();
+			}
 		}else{ //Haetaan hakusanan mukaiset autot
 			String hakusana = pathInfo.replace("/", "");
 			myynnit = dao.listaaKaikki(hakusana);
