@@ -25,16 +25,32 @@ public class Myynnit extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("Myynnit.doGet()");
-		String pathInfo = request.getPathInfo();	//haetaan kutsun polkutiedot, esim. /etunimi			
-		System.out.println("polku: "+pathInfo);	
-		String hakusana = pathInfo.replace("/", "");
+		String pathInfo = request.getPathInfo();	//haetaan kutsun polkutiedot, esim. /audi			
+		System.out.println("polku: "+pathInfo);		
 		Dao dao = new Dao();
-		ArrayList<Myynti> myynnit = dao.listaaKaikki(hakusana);
-		System.out.println(myynnit);
-		String strJSON = new JSONObject().put("myynnit", myynnit).toString();	
+		ArrayList<Myynti> myynnit;
+		String strJSON="";
+		if(pathInfo==null) { //Haetaan kaikki autot 
+			myynnit = dao.listaaKaikki();
+			strJSON = new JSONObject().put("myynnit", myynnit).toString();	
+		}else if(pathInfo.indexOf("haeyksi")!=-1) {		//polussa on sana "haeyksi", eli haetaan yhden auton tiedot
+			String tunniste = pathInfo.replace("/haeyksi/", ""); //poistetaan polusta "/haeyksi/", j‰ljelle j‰‰ rekno		
+			Myynti myynti = dao.etsiMyynti(tunniste);
+			JSONObject JSON = new JSONObject();
+			JSON.put("tunniste", myynti.getTunniste());
+			JSON.put("etunimi", myynti.getEtunimi());
+			JSON.put("sukunimi", myynti.getSukunimi());
+			JSON.put("puhelin", myynti.getPuhelin());
+			JSON.put("email", myynti.getSposti());
+			strJSON = JSON.toString();		
+		}else{ //Haetaan hakusanan mukaiset autot
+			String hakusana = pathInfo.replace("/", "");
+			myynnit = dao.listaaKaikki(hakusana);
+			strJSON = new JSONObject().put("myynnit", myynnit).toString();	
+		}	
 		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		out.println(strJSON);		
+		out.println(strJSON);			
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -60,7 +76,22 @@ public class Myynnit extends HttpServlet {
 
 	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		System.out.println("Myynnit.doPut()");
-		
+		JSONObject jsonObj = new JsonStrToObj().convert(request); //Muutetaan kutsun mukana tuleva json-string json-objektiksi			
+		String vanhatunniste = jsonObj.getString("vanhatunniste");
+		Myynti myynti = new Myynti();
+		myynti.setTunniste(jsonObj.getInt("tunniste"));
+		myynti.setEtunimi(jsonObj.getString("etunimi"));
+		myynti.setSukunimi(jsonObj.getString("sukunimi"));
+		myynti.setPuhelin(jsonObj.getString("puhelin"));
+		myynti.setSposti(jsonObj.getString("email"));
+		response.setContentType("application/json");
+		PrintWriter out = response.getWriter();
+		Dao dao = new Dao();			
+		if(dao.muutaMyynti(myynti, vanhatunniste)){ //metodi palauttaa true/false
+			out.println("{\"response\":1}");  //Auton muuttaminen onnistui {"response":1}
+		}else{
+			out.println("{\"response\":0}");  //Auton muuttaminen ep‰onnistui {"response":0}
+		}		
 	}
 	
 	protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

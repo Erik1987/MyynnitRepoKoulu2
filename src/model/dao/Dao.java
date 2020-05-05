@@ -124,4 +124,51 @@ public class Dao {
 		}				
 		return paluuArvo;
 	}
+	
+	public Myynti etsiMyynti(String tunniste) {
+		Myynti myynti = null;
+		sql = "SELECT * FROM asiakkaat WHERE asiakas_id=?";       
+		try {
+			con=yhdista();
+			if(con!=null){ 
+				stmtPrep = con.prepareStatement(sql); 
+				stmtPrep.setString(1, tunniste);
+        		rs = stmtPrep.executeQuery();  
+        		if(rs.isBeforeFirst()){ //jos kysely tuotti dataa, eli rekNo on käytössä
+        			rs.next();
+        			myynti = new Myynti();
+        			myynti.setTunniste(rs.getInt(1));
+        			myynti.setEtunimi(rs.getString(2));
+					myynti.setSukunimi(rs.getString(3));
+					myynti.setPuhelin(rs.getString(4));	
+					myynti.setSposti(rs.getString(5));       			      			
+				}        		
+			}	
+			con.close();  
+		} catch (Exception e) {
+			e.printStackTrace();
+		}		
+		return myynti;		
+	}
+	
+	public boolean muutaMyynti(Myynti myynti, String tunniste){
+		boolean paluuArvo=true;
+		sql="UPDATE asiakkaat SET asiakas_id=?, etunimi=?, sukunimi=?, puhelin=?, sposti=? WHERE asiakas_id=?";						  
+		try {
+			con = yhdista();
+			stmtPrep=con.prepareStatement(sql); 
+			stmtPrep.setInt(1, myynti.getTunniste());
+			stmtPrep.setString(2, myynti.getEtunimi());
+			stmtPrep.setString(3, myynti.getSukunimi());
+			stmtPrep.setString(4, myynti.getPuhelin());
+			stmtPrep.setString(5, myynti.getSposti());
+			stmtPrep.setString(6, tunniste);
+			stmtPrep.executeUpdate();
+	        con.close();
+		} catch (Exception e) {				
+			e.printStackTrace();
+			paluuArvo=false;
+		}				
+		return paluuArvo;
+	}
 }

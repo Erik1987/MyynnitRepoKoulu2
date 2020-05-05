@@ -83,6 +83,7 @@ function haeMyynnit(){
         	htmlStr+="<td>"+field.sukunimi+"</td>";
         	htmlStr+="<td>"+field.puhelin+"</td>";
         	htmlStr+="<td>"+field.sposti+"</td>"; 
+        	htmlStr+="<td><a href='muutamyynti.jsp?tunniste="+field.tunniste+"'>Muuta</a>&nbsp;"; 
         	htmlStr+="<td><span class='poista' onclick=poista('"+field.tunniste+"')>Poista</span></td>";
         	htmlStr+="</tr>";
         	$("#listaus tbody").append(htmlStr);
